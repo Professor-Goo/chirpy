@@ -17,14 +17,14 @@ func main() {
 	// Create a new ServeMux
 	mux := http.NewServeMux()
 
-	// Add readiness endpoint
-	mux.HandleFunc("/healthz", handlerReadiness)
+	// Add readiness endpoint (GET only)
+	mux.HandleFunc("GET /healthz", handlerReadiness)
 
-	// Add metrics endpoint
-	mux.HandleFunc("/metrics", apiCfg.handlerMetrics)
+	// Add metrics endpoint (GET only)
+	mux.HandleFunc("GET /metrics", apiCfg.handlerMetrics)
 
-	// Add reset endpoint
-	mux.HandleFunc("/reset", apiCfg.handlerReset)
+	// Add reset endpoint (POST only)
+	mux.HandleFunc("POST /reset", apiCfg.handlerReset)
 
 	// Add fileserver handler with /app prefix and metrics middleware
 	mux.Handle("/app/", apiCfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(".")))))
