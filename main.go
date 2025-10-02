@@ -8,8 +8,11 @@ func main() {
 	// Create a new ServeMux
 	mux := http.NewServeMux()
 
-	// Add fileserver handler for root path
-	mux.Handle("/", http.FileServer(http.Dir(".")))
+	// Add readiness endpoint
+	mux.HandleFunc("/healthz", handlerReadiness)
+
+	// Add fileserver handler with /app prefix
+	mux.Handle("/app/", http.StripPrefix("/app", http.FileServer(http.Dir("."))))
 
 	// Create and configure the server
 	server := &http.Server{
@@ -19,4 +22,11 @@ func main() {
 
 	// Start the server
 	server.ListenAndServe()
+}
+
+// handlerReadiness is a readiness endpoint handler
+func handlerReadiness(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
